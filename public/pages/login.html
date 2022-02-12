@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatUP - Sign in</title>
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+
+<body>
+    <section id="signin">
+        <h2>Sign in</h2>
+        <form action="" id="signinForm">
+            <label for="signin_username">Username</label>
+            <input id="signin_username" autocomplete="off" />
+            <label for="signin_password">Password</label>
+            <input type="password" id="signin_password" autocomplete="off" />
+            <button>Sign in</button>
+        </form>
+    </section>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var username = document.getElementById('signin_username');
+        var password = document.getElementById('signin_password');
+
+
+        signinForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const data = { username: username.value, password: password.value };
+            fetch('/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.token);
+                    if (data.success) {
+                        window.location.replace('http://localhost:3007/chat');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>

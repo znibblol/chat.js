@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatUP - Sign in</title>
+
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+
+<body>
+    <section id="signin">
+        <h2>Register</h2>
+        <form action="" id="signinForm">
+            <label for="signin_username">Username</label>
+            <input id="signin_username" autocomplete="off" />
+            <label for="signin_password">Password</label>
+            <input type="password" id="signin_password" autocomplete="off" />
+            <label for="signin_password_confirm">Confirm password</label>
+            <input type="password" id="signin_password_confirm" autocomplete="off" />
+            <button>Register</button>
+        </form>
+    </section>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let nickname = '';
+        var signinForm = document.getElementById('signinForm');
+        var username = document.getElementById('signin_username');
+        var password = document.getElementById('signin_password');
+        var password_confirm = document.getElementById('signin_password_confirm');
+
+
+        signinForm.addEventListener('submit', (event) => {
+            if (password.value === password_confirm.value) {
+                event.preventDefault();
+                const data = { username: username.value, password: password.value };
+                fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.replace('http://localhost:3007/auth/signin');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>

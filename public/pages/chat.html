@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatUP - Chat</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+
+<body>
+    <section id="chat">
+        <h2 style="text-align:center;">ChatUP</h2>
+        <div id="topnav" class="top-nav">
+            <ul>
+                <li onclick="openChat()">Chat</li>
+                <li onclick="openUsers()">Users</li>
+            </ul>
+        </div>
+        <div id="chat_tab">
+            <ul id="messages"></ul>
+            <div id="is_typing"></div>
+            <form action="" id="form">
+                <input id="input" autocomplete="off" placeholder="Aa" /><button>Send</button>
+            </form>
+        </div>
+        <div id="users">
+            <h4 style="text-align:center;"><i>Under uppbyggnad</i></h4>
+            <ul class="user-list" id="online_users">
+            </ul>
+        </div>
+    </section>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var messages = document.getElementById('messages');
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+        var users_tab = document.getElementById('users');
+        var chat_tab = document.getElementById('chat_tab');
+        var users_list = document.getElementById('online_users');
+
+        users_tab.style.display = 'none';
+
+        function openUsers() {
+            users_tab.style.display = 'block';
+            chat_tab.style.display = 'none';
+        }
+
+        function openChat() {
+            users_tab.style.display = 'none';
+            chat_tab.style.display = 'block';
+        }
+
+        function createMessage(data) {
+            var item = document.createElement('li');
+            item.setAttribute('class', data.class);
+            item.innerHTML = '<strong>' + data.user + ': </strong>' + data.message;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function isTyping(userTyping) {
+            var item = document.getElementById('is_typing');
+            item.innerHTML = '<strong>' + userTyping + '</strong> is typing...';
+        }
+
+        socketStart();
+
+        var nickname = "test";
+
+        function socketStart() {
+            var socket = io({
+                query: {
+                    "user": nickname || 'asdasd',
+                }
+            });
+
+            var timeout_id;
+
+            input.addEventListener('keydown', (event) => {
+                socket.emit('typing', nickname);
+                clearTimeout(timeout_id);
+                timeout_id = setTimeout(() => {
+                    socket.emit('notTyping', nickname);
+                }, 1500);
+            });
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                if (input.value.trim()) {
+                    socket.emit('chat message', input.value, nickname);
+                    createMessage({ user: 'Me', message: input.value, class: 'chat_bubble__me' });
+                    input.value = '';
+                    socket.emit('notTyping', nickname);
+                }
+            });
+
+            socket.on('online', (user) => {
+                item = document.createElement('li');
+                item.setAttribute('id', user);
+                item.innerHTML = user;
+                users_list.appendChild(item);
+            });
+
+            socket.on('chat message', (data) => {
+                createMessage(data);
+            });
+
+            socket.on('isTyping', (user) => {
+                isTyping(user);
+            });
+
+            socket.on('isNotTyping', (user) => {
+                if (document.getElementById('is_typing').innerHTML.includes(user)) {
+                    document.getElementById('is_typing').innerHTML = '';
+                }
+            });
+
+            socket.on('broadcast', (msg) => {
+                createMessage({ message: msg, user: 'Server', class: 'chat_bubble__server' });
+            });
+
+            socket.on("offline", (user) => {
+                users_list.removeChild(document.getElementById(user));
+            });
+        }
+
+    </script>
+</body>
+
+</html>
