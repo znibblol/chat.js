@@ -3,10 +3,10 @@ const auth = express.Router();
 const path = require('path');
 
 
-auth.get('/auth/signin', (req, res) => {
-  res.sendFile(__dirname + '/public/pages/login.html');
+auth.get('/signin', (req, res) => {
+  res.sendFile(path.resolve(__dirname + '/../../public/pages/login.html'));
 });
-auth.post('/auth/signin', (req, res) => {
+auth.post('/signin', (req, res) => {
   signinUser(req.body.username, req.body.password)
   .then(response => {
     jwt.verify(response, process.env.JWT_SECRET_ACCESS_TOKEN, (err, user) => {
@@ -28,10 +28,10 @@ auth.post('/auth/signin', (req, res) => {
   });
 });
 
-auth.get('/auth/register', (req, res) => {
-  res.sendFile(__dirname + '/public/pages/register.html');
+auth.get('/register', (req, res) => {
+  res.sendFile(path.resolve(__dirname + '/public/pages/register.html'));
 });
-auth.post('/auth/register', (req, res) => {
+auth.post('/register', (req, res) => {
   createUser(req.body.username, req.body.password)
   .then(result => {
     console.log(result);

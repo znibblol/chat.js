@@ -2,14 +2,17 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 
+const auth = require('./auth');
 
 router.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + '/../public/index.html'));
 });
 
 router.get('/chat', tokenCheck, (req, res) => {
-  res.sendFile(__dirname + '/public/pages/chat.html');
+  res.sendFile(path.resolve(__dirname + '/../public/pages/chat.html'));
 });
+
+router.use('/auth', auth);
 
 
 function tokenCheck(req, res, next) {

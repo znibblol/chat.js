@@ -6,22 +6,12 @@ const { Server } = require('socket.io');
 const io = new Server(server);
 const db = require('./src/database/db');
 require('dotenv').config();
-const jwt = require('jsonwebtoken');
 
 const router = require('./router');
 
 const PORT = process.env.PORT || 3000;
 
-const { createUser, signinUser } = require('./src/controller/UserController');
-const { JsonWebTokenError } = require('jsonwebtoken');
-
-try {
-  db.authenticate();
-  console.log('Connection has been extablished successfully.');
-  db.sync().then({});
-} catch(error) {
-  console.error('Unable ot connect to the database:', error);
-}
+db.sync().then({});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -64,6 +54,6 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log('listening on *:'+PORT);
+  console.log('Server is running on http://localhost:'+PORT);
 });
 
